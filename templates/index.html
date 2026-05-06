@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkHub Manager | 통합 링크 관리 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; letter-spacing: -0.025em; }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] text-[#1E293B] min-h-screen">
+
+    <!-- 상단 내비게이션 바 -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="bg-indigo-600 p-2 rounded-lg">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-slate-900">LinkHub <span class="text-indigo-600">Console</span></span>
+            </div>
+            <div class="flex items-center gap-4 text-sm font-medium text-slate-500">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> 시스템 정상</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        <div class="grid grid-cols-12 gap-8">
+            
+            <!-- 왼쪽: 데이터 입력 섹션 (4/12 슬롯) -->
+            <section class="col-span-12 lg:col-span-4">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 sticky top-24">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-bold text-slate-900">새 자산 등록</h2>
+                        <p class="text-slate-500 text-sm mt-1">외부 리소스의 제목과 유효한 URL을 입력하세요.</p>
+                    </div>
+
+                    <form action="/add-link" method="post" class="space-y-6">
+                        <div class="space-y-2">
+                            <label for="title" class="text-sm font-semibold text-slate-700 ml-1">리소스 명칭</label>
+                            <input type="text" id="title" name="title" required
+                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition bg-slate-50 focus:bg-white"
+                                   placeholder="예: 프로젝트 가이드라인">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="link" class="text-sm font-semibold text-slate-700 ml-1">엔드포인트 URL</label>
+                            <input type="url" id="link" name="link" required
+                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition bg-slate-50 focus:bg-white"
+                                   placeholder="https://docs.linkhub.com/...">
+                        </div>
+
+                        <button type="submit" 
+                                class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                            리소스 추가하기
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 오른쪽: 관리 리스트 섹션 (8/12 슬롯) -->
+            <section class="col-span-12 lg:col-span-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">전체 리소스 목록</h2>
+                        <p class="text-slate-500 text-sm">등록된 총 <span class="text-indigo-600 font-bold">{{ links|length }}</span>개의 자산이 검색되었습니다.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    {% if links %}
+                        {% for item in links %}
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 flex items-center justify-between group hover:border-indigo-300 hover:shadow-md transition-all">
+                            <div class="flex items-center gap-5">
+                                <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-900 text-lg">{{ item.title }}</h3>
+                                    <p class="text-slate-400 text-sm font-medium">{{ item.link }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3">
+                                <a href="{{ item.link }}" target="_blank" 
+                                   class="px-4 py-2 text-sm font-semibold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition">
+                                    접속
+                                </a>
+                                <form action="/delete/{{ item.id }}" method="post">
+                                    <button type="submit" 
+                                            class="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                                            onclick="return confirm('이 리소스를 영구적으로 삭제하시겠습니까?')">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="bg-white border-2 border-dashed border-slate-200 rounded-2xl py-20 text-center text-slate-400">
+                            <div class="mb-4 flex justify-center">
+                                <svg class="w-12 h-12 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                            </div>
+                            관리 중인 리소스가 없습니다.<br>새로운 링크를 등록하여 리스트를 구성하세요.
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </main>
+
+</body>
+</html>
